@@ -13,4 +13,8 @@
 
 return array(
     // ...
+    'moduleLayouts' => array(
+    	'Application' => 'layout/layout.phtml',
+    	'Blog' => 'layout/blog.phtml',
+    ),
 );

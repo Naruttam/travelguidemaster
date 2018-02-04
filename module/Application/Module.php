@@ -19,6 +19,17 @@ class Module
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
+
+        $eventManager->getSharedManager()->attach('Zend\Mvc\Controller\AbstractActionController', 'dispatch', function($event){
+            $controller         = $event->getTarget();
+            $controllerName     =   get_class($controler);
+            $moduleNamespace    =  substr($controllerName, 0, strpos($controllerName,'\\'));
+            $configs            =   $event->getApplication()->getServiceManager()->get('config');
+
+            if(isset($configs['moduleLayouts'][$moduleNamespace])){
+                $controller->layout($configs['moduleLayouts'][$moduleNamespace]);
+            }
+        },100);
     }
 
     public function getConfig()
