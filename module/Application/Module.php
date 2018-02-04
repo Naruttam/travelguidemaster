@@ -22,7 +22,7 @@ class Module
 
         $eventManager->getSharedManager()->attach('Zend\Mvc\Controller\AbstractActionController', 'dispatch', function($event){
             $controller         = $event->getTarget();
-            $controllerName     =   get_class($controler);
+            $controllerName     =   get_class($controller);
             $moduleNamespace    =  substr($controllerName, 0, strpos($controllerName,'\\'));
             $configs            =   $event->getApplication()->getServiceManager()->get('config');
 
