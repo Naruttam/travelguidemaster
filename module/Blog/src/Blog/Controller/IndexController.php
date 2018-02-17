@@ -1,7 +1,5 @@
 <?php
-
 namespace Blog\Controller;
-error_reporting( E_ALL );
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Db\TableGateway\TableGateway;
@@ -40,15 +38,23 @@ class IndexController extends AbstractActionController
            
             //$staticSalt = $config['static_salt'];
             $secretKey      =   MD5($formData['password']);
-            $authAdapter    =   new AuthAdapter($dbAdapter,
-                    'users',
+            $authAdapter    =   new AuthAdapter($dbAdapter);
+           /*         'users',
                     'user_name',
                     'secret_key' 
-            );
+            );*/
+            $authAdapter->setTableName('users')
+                        ->setIdentityColumn('user_name')
+                        ->setCredentialColumn('secret_key');
+                    //->setCredentialTreatment('MD5(?)');
 
-            $authAdapter 
-                    ->setIdentity($formData['username'])
-                    ->setCredential($secretKey);
+            $authAdapter->setIdentity($formData['username'])
+                        ->setCredential($secretKey);
+
+            $authAdapter->getDbSelect()->where('active = 1 AND id = 1'); // query db using where query
+
+
+
             $auth           =   new AuthenticationService();
             $result         =   $auth->authenticate($authAdapter);
            //echo "<pre>"; print_r($formData);exit();

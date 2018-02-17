@@ -11,6 +11,7 @@ return array(
         'invokables' => array(
             //'Blog\Controller\Index' => Controller\IndexController::class
             'Blog\Controller\Index' => 'Blog\Controller\IndexController',
+            'Blog\Controller\Login' => 'Blog\Controller\LoginController',
         ),
     ),
 	'router' => array(
