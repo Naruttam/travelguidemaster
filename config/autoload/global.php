@@ -17,4 +17,16 @@ return array(
     	'Application' => 'layout/layout.phtml',
     	'Blog' => 'layout/blog.phtml',
     ),
+    'db' => array(
+    	'driver' => 'Pdo',
+    	/*'driver_options'=> array(
+    		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET_NAMES \'UTF8\''
+    	),*/
+    ),
+    'service_manager' => array(
+    	'factories' => array(
+    		'Zend\Db\Adapter\Adapter' => 'Zend\Db\Adapter\AdapterServiceFactory',
+    	),
+    ),
+
 );

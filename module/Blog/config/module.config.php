@@ -1,7 +1,18 @@
 <?php
 
 namespace Blog;
-return array(
+return array(    
+    'view_helpers' =>array(
+        "invokables" => array(
+                "navigation" => "Blog\View\Helper\Navigation",
+            ),
+    ),
+    'controllers' => array(
+        'invokables' => array(
+            //'Blog\Controller\Index' => Controller\IndexController::class
+            'Blog\Controller\Index' => 'Blog\Controller\IndexController',
+        ),
+    ),
 	'router' => array(
         'routes' => array(
             // The following is a route to simplify getting started creating
@@ -23,10 +34,11 @@ return array(
                     'default' => array(
                         'type'    => 'Segment',
                         'options' => array(
-                            'route'    => '/[:controller[/:action]]',
+                            'route'    => '/[:controller[/:action[/:id]]]',
                             'constraints' => array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'id'         => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ),
                             'defaults' => array(
                             ),
@@ -36,16 +48,17 @@ return array(
             ),
         ),
     ),
-
-	'controllers' => array(
-        'invokables' => array(
-            'Blog\Controller\Index' => Controller\IndexController::class
-        ),
-    ),
-
     'view_manager' => array(
         'template_path_stack' => array(
             __DIR__ . '/../view',
+        ),
+    ),
+    'service_manager' => array(
+        'aliases' => array(
+            'Zend\Authentication\AuthenticationService' => 'my_auth_service',
+        ),
+        'invokables' => array(
+            'my_auth_service' => 'Zend\Authentication\AuthenticationService',
         ),
     ),
 );
