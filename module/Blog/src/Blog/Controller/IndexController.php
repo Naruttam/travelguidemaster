@@ -13,91 +13,51 @@ use Zend\Db\Adapter\Adapter as DbAdapter;
 use Zend\Authentication\Adapter\DbTable as AuthAdapter;
 use Blog\Model\Blog;
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 class IndexController extends AbstractActionController
 {
-	private $userstable;
-	public function indexAction()
+	protected $userprofileTable;
+	
+    public function onDispatch(\Zend\Mvc\MvcEvent $e)
+    {
+        $authservice = new AuthenticationService();
+
+        if (! $authservice->hasIdentity()) {
+            //return $this->redirect()->toRoute('blog/login');
+            return $this->redirect()->toRoute('blog/default', array('controller' => 'login', 'action' => 'index'));
+                //break;
+        }
+
+        return parent::onDispatch($e);
+    }
+
+    public function indexAction()
 	{
-		return new ViewModel();
+		$user = "";
+        $userID = "";
+        if($user = $this->identity()){
+            $userID = $user->id;
+        }
+
+        $userprofileTable = $this->getuserprofileTable();
+        $users = $userprofileTable->getUsersbyParentId($userID);
+
+        return new ViewModel(
+            array('users' => $users)
+        );
 	}
 
-	public function loginAction()
+    public function getuserprofileTable()
     {
-        //$layout             =   $this->layout();
-        //$layout->setTemplate('layout/login');
-        $user               =   $this->identity();
-        $request            =   $this->getRequest();
-        //echo "<pre>"; print_r($request->getPost());
-        if($request->isPost()){
-
-            $sm             =   $this->getServiceLocator();
-            $dbAdapter      =   $sm->get('Zend\Db\Adapter\Adapter');
-            //$config = $this->getServiceLocator()->get('Config');
-            $formData       =   $request->getPost();
-
-           
-            //$staticSalt = $config['static_salt'];
-            $secretKey      =   MD5($formData['password']);
-            $authAdapter    =   new AuthAdapter($dbAdapter);
-           /*         'users',
-                    'user_name',
-                    'secret_key' 
-            );*/
-            $authAdapter->setTableName('users')
-                        ->setIdentityColumn('user_name')
-                        ->setCredentialColumn('secret_key');
-                    //->setCredentialTreatment('MD5(?)');
-
-            $authAdapter->setIdentity($formData['username'])
-                        ->setCredential($secretKey);
-
-            $authAdapter->getDbSelect()->where('active = 1 AND id = 1'); // query db using where query
-
-
-
-            $auth           =   new AuthenticationService();
-            $result         =   $auth->authenticate($authAdapter);
-           //echo "<pre>"; print_r($formData);exit();
-            switch($result->getCode()){
-                case Result::FAILURE_IDENTITY_NOT_FOUND:
-                    //do stuff for non existent identity
-                    $result = "Invalid Credentials";
-                    return new ViewModel(array('result' => $result));
-                break;
-
-                case Result::FAILURE_CREDENTIAL_INVALID:
-                    //do stuff for invalid credential.
-                    $result = "Invalid Credentials";
-                    return new ViewModel(array('result' => $result));
-                break;
-
-                case Result::SUCCESS:
-                    $storage = $auth->getStorage();
-                    $storage->write($authAdapter->getResultRowObject(
-                        null,
-                        'secret_key'
-                    ));
-                    return $this->redirect()->toRoute('blog/default', array('controller' => 'index', 'action' => 'index'));
-                break;
-
-                default:
-                break;
-            }
+        if(!$this->userprofileTable){
+            $sm = $this->getServiceLocator();
+            $this->userprofileTable = $sm->get('Blog\Model\UserprofileTable');
         }
-        
-    	//return new ViewModel(array('result' => $result));
+        return $this->userprofileTable;
     }
 
-	public function getusersTable()
-    {
-    	if(!$this->userstable){
-    		$this->userstable = new tableGateway(
-    			'users',
-    			$this->getServiceLocator()->get('Zend\Db\Adapter\Adapter')
-    		);
-    	}
-    	return $this->userstable;
-    }
 
     public function signoutAction()
     {
@@ -108,7 +68,7 @@ class IndexController extends AbstractActionController
             $identity = $auth->getIdentity();
         }
         $auth->clearIdentity();
-        return $this->redirect()->toRoute('blog/default', array('controller'=>'index','action'=>'login'));
+        return $this->redirect()->toRoute('blog/default', array('controller'=>'login','action'=>'index'));
     }
 
 

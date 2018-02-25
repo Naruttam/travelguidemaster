@@ -35,7 +35,12 @@ class Navigation extends AbstractHelper
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
                         <li>
-                            <a href="#">
+                            <a href="';
+
+                    //$navigation .= $this->url('blog/default', array('controller' => 'profile', 'action' => 'index'));
+
+
+                    $navigation .='">
                                 <i class="fa fa-dashboard"></i> <span>Dashboard</span>
                             </a>
                         </li>

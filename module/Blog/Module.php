@@ -14,7 +14,11 @@ use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\TableGateway\TableGateway;
+use Blog\Model\Blog;
+use Blog\Model\UsersTable;
+use Blog\Model\UserprofileTable;
 
 class Module implements ConfigProviderInterface, ServiceProviderInterface, AutoloaderProviderInterface 
 {
@@ -36,6 +40,49 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface, Autol
 
     public function getServiceConfig()
     {
-        return include __DIR__ . '/config/service.config.php';
+        return array(
+
+            'factories' => array(
+
+                'Blog\Model\UsersTable' => function($sm)
+                {
+                    $tableGateway   =   $sm->get('UsersTableGateway');
+                    $table          =   new UsersTable($tableGateway);
+                    return $table; 
+                },
+
+                'UsersTableGateway' =>    function($sm)
+                {
+                    $dbAdapter      =   $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype =   new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Users());
+                    return new TableGateway('users', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Blog\Model\UserprofileTable' => function($sm)
+                {
+                    $tableGateway   =   $sm->get('UserprofileTableGateway');
+                    $table          =   new UserprofileTable($tableGateway);
+                    return $table; 
+                },
+
+                'UserprofileTableGateway' =>    function($sm)
+                {
+                    $dbAdapter      =   $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype =   new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Blog());
+                    return new TableGateway('user_profile', $dbAdapter, null, $resultSetPrototype);
+                },
+
+            ),
+            /*
+                To reduce the above reduntant code check the below link.
+            */
+            /*https://samsonasik.wordpress.com/2012/08/28/set-default-db-adapter-in-zend-framework-2/*/
+
+        );
+
+
+        //return include __DIR__ . '/config/service.config.php';
     }
 }

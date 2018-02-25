@@ -10,8 +10,10 @@ return array(
     'controllers' => array(
         'invokables' => array(
             //'Blog\Controller\Index' => Controller\IndexController::class
-            'Blog\Controller\Index' => 'Blog\Controller\IndexController',
-            'Blog\Controller\Login' => 'Blog\Controller\LoginController',
+            'Blog\Controller\Index'     => 'Blog\Controller\IndexController',
+            'Blog\Controller\Login'     => 'Blog\Controller\LoginController',
+            'Blog\Controller\Profile'   => 'Blog\Controller\ProfileController',
+            'Blog\Controller\User'      => 'Blog\Controller\UserController',
         ),
     ),
 	'router' => array(

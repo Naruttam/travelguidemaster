@@ -1,4 +1,6 @@
 <?php
 
 	namespace Blog;
-	return array();
+	return array(
+
+	);
